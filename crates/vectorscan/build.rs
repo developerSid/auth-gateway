@@ -26,6 +26,17 @@ fn main() {
    if !src_dir.join("CMakeLists.txt").exists() {
       download_vectorscan(&tarball, &vectorscan_version);
       extract_tarball(&tarball, &src_dir);
+
+      // Clean up folders/files that link against pcre
+      let tools_cmake = src_dir.join("tools").join("CMakeLists.txt");
+      if tools_cmake.exists() {
+         let _ = std::fs::remove_file(tools_cmake);
+      }
+      let unit_cmake = src_dir.join("unit").join("CMakeLists.txt");
+      if unit_cmake.exists() {
+         // Replace unit tests with an empty CMake list to bypass building them
+         let _ = std::fs::write(unit_cmake, "");
+      }
    }
 
    build_vectorscan(&src_dir, &out_dir);
@@ -104,6 +115,9 @@ fn build_vectorscan(src_dir: &Path, out_dir: &Path) {
       .out_dir(&build_dir)
       .define("BUILD_SHARED_LIBS", "OFF")
       .define("BUILD_STATIC_LIBS", "ON")
+      .define("BUILD_CHIMERA", "OFF")
+      .define("BUILD_EXAMPLES", "OFF")
+      .define("BUILD_BENCHMARKS", "OFF")
       .build();
 
    // Tell Cargo where to find the built libs (cmake installs into prefix/lib)
