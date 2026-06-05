@@ -1,0 +1,22 @@
+{
+  "$schema": "https://raw.githubusercontent.com/devcontainers/spec/main/schemas/devContainer.schema.json",
+  "name": "auth-gateway-dev",
+  "service": "auth-gateway-dev",
+  "dockerComposeFile": "docker-compose.yaml",
+  "build": {},
+  "features": {
+    "ghcr.io/devcontainers-extra/features/zsh-plugins:0": {
+      "plugins": "aws direnv git pre-commit npm"
+    },
+    "ghcr.io/devcontainers-extra/features/direnv:1": {}
+  },
+  "customizations": {},
+  "remoteUser": "vscode",
+  "mounts": [
+    "source=${localWorkspaceFolder},target=/workspace/,type=bind,consistency=cached",
+    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached"
+  ],
+  "postCreateCommand": "bash /home/vscode/.devcontainer/postcreate.sh",
+  "postStartCommand": "bash /home/vscode/.devcontainer/poststart.sh ${containerWorkspaceFolder}",
+  "workspaceFolder": "/workspace/"
+}

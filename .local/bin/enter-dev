@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+set -e
+
+cd "${0%/*}" # set a consistent directory to be the location of this script
+cd ../..
+
+if ! docker ps | grep -q auth-gateway-dev; then
+  echo "Starting dev container..."
+  ./.local/bin/start-dev
+fi
+
+echo "Entering dev container..."
+docker exec -it auth-gateway-dev zsh --login
+

@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+set -e
+
+cd "${0%/*}" # set a consistent directory to be the location of this script
+cd ../..
+
+devcontainer up --workspace-folder .
+
+docker exec -it auth-gateway-dev zsh --login
+

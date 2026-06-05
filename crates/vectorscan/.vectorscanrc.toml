@@ -1,0 +1,5 @@
+# Version pins for vendored dependencies (used by build.rs and .local/bin/prep-repo).
+# TOML format.
+
+[vendored]
+vectorscan_version = "5.4.11"

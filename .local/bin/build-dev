@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+set -e
+
+cd "${0%/*}" # set a consistent directory to be the location of this script
+cd ../..
+
+devcontainer build --no-cache --workspace-folder .

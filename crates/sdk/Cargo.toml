@@ -1,0 +1,7 @@
+[package]
+name = "auth-gateway-sdk"
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+auth-gateway-vectorscan = { path = "../vectorscan" }

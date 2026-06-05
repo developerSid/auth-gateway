@@ -1,0 +1,19 @@
+name: auth-gateway-dev
+volumes:
+  build-target:
+networks:
+  gatenet:
+    name: gatenet
+
+services:
+  auth-gateway-dev:
+    build:
+      dockerfile: ./Dockerfile
+    container_name: auth-gateway-dev
+    hostname: auth-gateway
+    networks:
+      - gatenet
+    volumes:
+      - build-target:/workspace/.build/
+    stop_signal: SIGKILL
+    command: sleep infinity

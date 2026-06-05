@@ -1,0 +1,98 @@
+#!/usr/bin/env bash
+# prep-repo: Easy button for getting build dependencies ready.
+# Installs system packages needed to build (VectorScan, etc.). The build
+# downloads the VectorScan tarball automatically. Run from the workspace root.
+# Supports: macOS (Homebrew), Debian, Ubuntu, Fedora.
+
+set -euo pipefail
+
+# --- Detect OS / distro ---
+detect_platform() {
+  local os
+  os="$(uname -s)"
+  case "$os" in
+    Darwin)
+      echo "macos"
+      return
+      ;;
+    Linux)
+      if [[ -f /etc/os-release ]]; then
+        # shellcheck source=/dev/null
+        source /etc/os-release
+        case "${ID:-}" in
+          debian|ubuntu) echo "debian"; return ;;
+          fedora)        echo "fedora"; return ;;
+          *)             echo "linux-unknown"; return ;;
+        esac
+      fi
+      echo "linux-unknown"
+      ;;
+    *)
+      echo "unknown"
+      ;;
+  esac
+}
+
+# --- Install build dependencies per platform ---
+install_deps_macos() {
+  if ! command -v brew &>/dev/null; then
+    echo "prep-repo: Homebrew not found. Install from https://brew.sh" >&2
+    exit 1
+  fi
+  echo "prep-repo: Installing build dependencies with Homebrew..."
+  brew install boost cmake gcc libpcap pcre pkg-config ragel sqlite
+}
+
+install_deps_debian() {
+  if ! command -v apt-get &>/dev/null; then
+    echo "prep-repo: apt-get not found." >&2
+    exit 1
+  fi
+  echo "prep-repo: Installing build dependencies with apt..."
+  sudo apt-get update
+  sudo apt-get install -y \
+    build-essential \
+    cmake \
+    ragel \
+    pkg-config \
+    libsqlite3-dev \
+    libpcap-dev \
+    libpcre3-dev \
+    libboost-all-dev
+}
+
+install_deps_fedora() {
+  if ! command -v dnf &>/dev/null; then
+    echo "prep-repo: dnf not found." >&2
+    exit 1
+  fi
+  echo "prep-repo: Installing build dependencies with dnf..."
+  sudo dnf install -y \
+    @development-tools \
+    cmake \
+    ragel \
+    pkg-config \
+    sqlite-devel \
+    libpcap-devel \
+    pcre-devel \
+    boost-devel
+}
+
+install_deps() {
+  local platform
+  platform="$(detect_platform)"
+  case "$platform" in
+    macos)   install_deps_macos ;;
+    debian)  install_deps_debian ;;
+    fedora)  install_deps_fedora ;;
+    *)
+      echo "prep-repo: Unsupported platform: $platform" >&2
+      echo "prep-repo: Supported: macOS (Homebrew), Debian, Ubuntu, Fedora." >&2
+      exit 1
+      ;;
+  esac
+}
+
+# --- Main ---
+install_deps
+echo "prep-repo: done."
